@@ -1,0 +1,90 @@
+create table tb_a (id number (12), 
+nombre varchar (50), 
+tipo varchar (35), 
+valor number (10));
+
+drop table tb_a;
+
+delete from tb_b;
+
+select * from tb_a;
+
+create table tb_b (descripcion varchar (100),
+fecha_1 varchar (50));
+
+drop table tb_b;
+
+select * from tb_b;
+
+insert into tb_a values (001, 'donitas', 'pan', 20);
+insert into tb_a values (002, 'rebanada', 'pan', 10);
+insert into tb_a values (003, 'mantecadas', 'pan', 25);
+insert into tb_a values (004, 'nito', 'pan', 15);
+insert into tb_a values (005, 'buñuelos', 'pan', 20);
+insert into tb_a values (021, 'doritos', 'botana', 15);
+insert into tb_a values (022, 'paketaxo', 'botana', 56);
+insert into tb_a values (023, 'Sabritas adobadas', 'botana', 35);
+insert into tb_a values (024, 'crujitos', 'botana', 15);
+insert into tb_a values (025, 'sabritones', 'botana', 50);
+insert into tb_a values (051, 'pulparindo', 'dulce', 8);
+insert into tb_a values (052, 'picafresa', 'dulce', 2);
+insert into tb_a values (053, 'mazapan', 'dulce', 8);
+insert into tb_a values (054, 'panditas', 'dulce', 18);
+insert into tb_a values (055, 'dragoncito', 'dulce', 3);
+
+-----------------------------------------Trigger actualizar------------------------------
+
+
+CREATE OR REPLACE TRIGGER tr_acciones_tb_a
+AFTER INSERT OR UPDATE OR DELETE
+ON tb_a
+FOR EACH ROW
+DECLARE
+    descripcion VARCHAR2(50);
+BEGIN
+    IF INSERTING THEN
+        descripcion := 'Se ha insertado un dato';
+    ELSIF UPDATING THEN
+        descripcion := 'Se ha actualizado un dato ';
+    ELSIF DELETING THEN
+        descripcion := 'Se ha eliminado un dato';
+    END IF;
+    
+    INSERT INTO tb_b (descripcion, fecha_1) VALUES (descripcion, 'null');
+END tr_acciones_tb_a;
+/
+
+delete from tb_a where id= 55;
+update tb_a set costo = 17 where nombre_p = 'Sabritas adobadas'; 
+insert into tb_a values (090, 'Totis de Queso', 'botana', 7);
+----------------------------------Trigger insertar dato fecha y hora-------------------------------
+ Create or replace Trigger tr_insertar_fecha_tiendita
+ after insert 
+ on tb_a
+ for each row
+ declare 
+ v_fecha_hora timestamp;
+ begin
+ IF SUBSTR(:new.nombre,1,1) = 'd' then  
+    select systimestamp into v_fecha_hora from dual; 
+    insert into tb_b 
+    values ('se agregó un producto y que su nombre empieza con d’', v_fecha_hora );
+    END IF;
+ end tr_insertar_fecha_tiendita;
+ insert into tb_a values (091, 'detergente', 'Hogar', 40);
+ --------------------------------Trigger eliminar humilde-----------------------
+  Create or replace Trigger tr_eliminar_producto_humilde
+ after delete 
+ on tb_a
+ for each row
+ declare 
+ v_fecha_hora timestamp;
+ begin
+ IF (:OLD.valor <= 12) THEN
+    select systimestamp into v_fecha_hora from dual; 
+    INSERT INTO tb_b VALUES 
+    ('se eliminó un producto humilde que quería comprar con lo que tenia de mi pasaje :,c',v_fecha_hora);
+  END IF;
+END tr_eliminar_producto_humilde;
+
+delete from tb_a where nombre = 'rebanada';
